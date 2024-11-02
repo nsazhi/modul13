@@ -62,27 +62,42 @@ async def set_growth(message, state):
         await state.update_data(age=int(message.text))
         await message.answer('Введите свой рост:')
         await UserState.growth.set()
-    except ValueError as err:
+    except ValueError:
         logging.basicConfig(level=logging.ERROR, filemode='a', filename='./calc_kkal.log', encoding='utf-8',
                             format='%(asctime)s | %(levelname)s | %(message)s')
         logging.error('Некорректное значение возраста')
         await message.answer('Некорректный ответ. Начните еще раз.', reply_markup=main_menu_kb)
         await state.finish()
 
+
 @dp.message_handler(state=UserState.growth)
 async def set_weight(message, state):
-    await state.update_data(growth=int(message.text))
-    await message.answer('Введите свой вес:')
-    await UserState.weight.set()
+    try:
+        await state.update_data(growth=int(message.text))
+        await message.answer('Введите свой вес:')
+        await UserState.weight.set()
+    except ValueError:
+        logging.basicConfig(level=logging.ERROR, filemode='a', filename='./calc_kkal.log', encoding='utf-8',
+                            format='%(asctime)s | %(levelname)s | %(message)s')
+        logging.error('Некорректное значение роста')
+        await message.answer('Некорректный ответ. Начните еще раз.', reply_markup=main_menu_kb)
+        await state.finish()
 
 
 @dp.message_handler(state=UserState.weight)
 async def send_calories(message, state):
-    await state.update_data(weight=int(message.text))
-    data = await state.get_data()
-    kkal = 10 * data['weight'] + 6.25 * data['growth'] - 5 * data['age'] - 161
-    await message.answer(f'Ваша норма в сутки: {int(kkal)} ккал')
-    await state.finish()
+    try:
+        await state.update_data(weight=int(message.text))
+        data = await state.get_data()
+        kkal = 10 * data['weight'] + 6.25 * data['growth'] - 5 * data['age'] - 161
+        await message.answer(f'Ваша норма в сутки: {int(kkal)} ккал')
+        await state.finish()
+    except ValueError:
+        logging.basicConfig(level=logging.ERROR, filemode='a', filename='./calc_kkal.log', encoding='utf-8',
+                            format='%(asctime)s | %(levelname)s | %(message)s')
+        logging.error('Некорректное значение веса')
+        await message.answer('Некорректный ответ. Начните еще раз.', reply_markup=main_menu_kb)
+        await state.finish()
 
 
 if __name__ == '__main__':
