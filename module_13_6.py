@@ -63,10 +63,11 @@ async def set_growth(message, state):
         await message.answer('Введите свой рост:')
         await UserState.growth.set()
     except ValueError as err:
+        logging.basicConfig(level=logging.ERROR, filemode='a', filename='./calc_kkal.log', encoding='utf-8',
+                            format='%(asctime)s | %(levelname)s | %(message)s')
         logging.error('Некорректное значение возраста')
         await message.answer('Некорректный ответ. Начните еще раз.', reply_markup=main_menu_kb)
         await state.finish()
-
 
 @dp.message_handler(state=UserState.growth)
 async def set_weight(message, state):
@@ -86,5 +87,3 @@ async def send_calories(message, state):
 
 if __name__ == '__main__':
     executor.start_polling(dp, skip_updates=True)
-    logging.basicConfig(level=logging.ERROR, filemode='a', filename='calc_kkal.log',
-                        format='%(asctime)s | %(levelname)s | %(message)s')
